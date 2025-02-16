@@ -20,7 +20,7 @@ public class BookService {
     @Autowired
     public AuthorRepo authorRepo;
 
-    public Book FindByID(Long id){
+    public Book findByID(Long id){
         return bookRepo.findById(id).orElseThrow();
     }
 
@@ -29,15 +29,20 @@ public class BookService {
     }
 
     public Book insert(Book book){
-        if(book.getId() != null){
-            throw new RuntimeException();
-        }
+        Author author = authorRepo.findById(book.getAuthor().getId())
+                .orElseThrow(() -> new RuntimeException("Author not found"));
+
+        Book newbook = new Book();
+        book.setName(book.getName());
+        book.setPrice(book.getPrice());
+        book.setAuthor(author); // Set Author object
+
         return bookRepo.save(book);
     }
 
     public Book update(Book book) {
         // Find the existing book by its ID
-        Book existingBook = FindByID(book.getId());
+        Book existingBook = findByID(book.getId());
         if (existingBook == null) {
             throw new IllegalArgumentException("Book with ID " + book.getId() + " not found.");
         }
